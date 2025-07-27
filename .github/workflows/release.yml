@@ -1,0 +1,58 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          ## Miniflux to Instapaper Webhook Service ${{ github.ref }}
+
+          Automated release for ${{ github.ref }}
+
+          ## Docker Images
+
+          ```bash
+          # Pull the latest image
+          docker pull ghcr.io/dylanfrankcom/miniflux-to-instapaper:latest
+          docker pull ghcr.io/dylanfrankcom/miniflux-to-instapaper:${{ github.ref_name }}
+
+          # Run with docker-compose
+          curl -o docker-compose.yml https://raw.githubusercontent.com/dylanfrankcom/miniflux-to-instapaper/main/docker-compose.yml
+          docker-compose -f docker-compose.yml up -d
+          ```
+
+          ## Configuration
+
+          Make sure to create a `.env` file with your credentials:
+
+          ```bash
+          MINIFLUX_WEBHOOK_SECRET=your_webhook_secret
+          INSTAPAPER_USERNAME=your_instapaper_username
+          INSTAPAPER_PASSWORD=your_instapaper_password
+          WEBHOOK_HOST=0.0.0.0
+          WEBHOOK_PORT=5002
+          ```
+
+          ## Webhook URL for Miniflux
+
+          Configure your Miniflux webhook to point to: `http://your-server:5002/webhook`
+        draft: false
+        prerelease: false
