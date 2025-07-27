@@ -2,10 +2,15 @@ name: Build and Publish Docker Image
 
 on:
   push:
-    branches: [ main ]
     tags: [ 'v*' ]
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'docs/**'
+      - '*.md'
 
 env:
   REGISTRY: ghcr.io

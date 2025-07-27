@@ -20,17 +20,29 @@ A Python microservice that automatically forwards new articles from Miniflux RSS
 2. **Miniflux Instance**: You need a running Miniflux instance with admin access
 3. **Server/Hosting**: A server or hosting platform to run the webhook service
 
-### 1. Download Necessary Files
+### 1. Docker Compose
 
-```bash
-# Download the docker-compose file
-curl -o docker-compose.yml https://raw.githubusercontent.com/dylanfrankcom/miniflux-to-instapaper/main/docker-compose.yml
-
-# Download the environment template
-curl -o .env.sample https://raw.githubusercontent.com/dylanfrankcom/miniflux-to-instapaper/main/.env.sample
-
-# Copy and configure environment
-cp .env.sample .env
+```yaml
+services:
+  miniflux-to-instapaper:
+    image: ghcr.io/dylanfrankcom/miniflux-to-instapaper:latest
+    ports:
+      - "5002:5002"
+    environment:
+      - MINIFLUX_WEBHOOK_SECRET=${MINIFLUX_WEBHOOK_SECRET}
+      - INSTAPAPER_USERNAME=${INSTAPAPER_USERNAME}
+      - INSTAPAPER_PASSWORD=${INSTAPAPER_PASSWORD}
+      - WEBHOOK_HOST=0.0.0.0
+      - WEBHOOK_PORT=5002
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 ```
 
 ### 2. Configure Environment Variables
@@ -84,7 +96,7 @@ The service handles two types of Miniflux webhook events:
 ### 2. Saved Entries (`save_entry`)
 
 - Triggered when you manually save an article in Miniflux
-- Adds the saved article to Instapaper with a "[Saved from Miniflux]" tag
+- Adds the saved article to Instapaper
 - Useful for articles you want to read later
 
 > [!NOTE]

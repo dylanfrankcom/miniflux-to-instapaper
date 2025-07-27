@@ -229,12 +229,6 @@ def process_saved_entry(entry: Dict) -> bool:
             else:
                 description = text_content
 
-        # Add a note that this was saved in Miniflux
-        if description:
-            description = f"[Saved from Miniflux] {description}"
-        else:
-            description = "[Saved from Miniflux]"
-
         success = instapaper.add_article(
             url=url,
             title=title,
@@ -341,7 +335,7 @@ def index():
     """Root endpoint with basic info"""
     return jsonify({
         'service': 'Miniflux to Instapaper Webhook',
-        'version': '1.0.0',
+        'version': '1.0.1',
         'endpoints': {
             'webhook': '/webhook',
             'health': '/health'
